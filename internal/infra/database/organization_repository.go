@@ -15,9 +15,9 @@ type organization struct {
 	Name        uint64     `db:"name"`
 	Description *string    `db:"description"`
 	City        string     `db:"city"`
-	Adress      string     `db:"adress"`
+	Address     string     `db:"address"`
 	Lat         float64    `db:"lat"`
-	Lot         float64    `db:"lot"`
+	Lon         float64    `db:"lon"`
 	CreatedDate time.Time  `db:"created_date"`
 	UpdatedDate time.Time  `db:"updated_date"`
 	DeletedDate *time.Time `db:"deleted_date"`
@@ -28,7 +28,7 @@ type organizationRepository struct {
 	sess db.Session
 }
 
-type organizationRepository interface {
+type OrganizationRepository interface {
 	Save(o domain.Organization) (domain.Organization, error)
 }
 
@@ -62,9 +62,9 @@ func (r organizationRepository) mapDomainToModel(o domain.Organization) organiza
 		Name:        o.Name,
 		Description: o.Description,
 		City:        o.City,
-		Adress:      o.Adress,
+		Address:     o.Address,
 		Lat:         o.Lat,
-		Lot:         o.Lot,
+		Lon:         o.Lon,
 		CreatedDate: o.CreatedDate,
 		UpdatedDate: o.UpdatedDate,
 		DeletedDate: o.DeletedDate,
@@ -78,9 +78,9 @@ func (r organizationRepository) mapModelToDomain(o organization) domain.Organiza
 		Name:        o.Name,
 		Description: o.Description,
 		City:        o.City,
-		Adress:      o.Adress,
+		Address:     o.Address,
 		Lat:         o.Lat,
-		Lot:         o.Lot,
+		Lon:         o.Lon,
 		CreatedDate: o.CreatedDate,
 		UpdatedDate: o.UpdatedDate,
 		DeletedDate: o.DeletedDate,
