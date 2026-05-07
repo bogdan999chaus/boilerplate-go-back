@@ -22,9 +22,9 @@ func NewOrganizationController(os app.OrganizationService) OrganizationControlle
 
 func (c OrganizationController) Save() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		org, err := requsts.Bind(r, requests.OrganizationRequest{}, domain.Organization{})
+		org, err := requests.Bind(r, requests.OrganizationRequest{}, domain.Organization{})
 		if err != nil {
-			log.Printf("OrganizationController.Save(requsts.Bind): %s", err)
+			log.Printf("OrganizationController.Save(requests.Bind): %s", err)
 			BadRequest(w, err)
 			return
 		}
