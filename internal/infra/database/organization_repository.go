@@ -12,7 +12,7 @@ const OrganizationTableName = "organizations"
 type organization struct {
 	Id          uint64     `db:"id,omitempty"`
 	UserId      uint64     `db:"user_id"`
-	Name        uint64     `db:"name"`
+	Name        string     `db:"name"`
 	Description *string    `db:"description"`
 	City        string     `db:"city"`
 	Address     string     `db:"address"`

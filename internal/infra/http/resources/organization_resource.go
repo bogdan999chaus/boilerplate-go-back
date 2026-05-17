@@ -5,7 +5,7 @@ import "github.com/BohdanBoriak/boilerplate-go-back/internal/domain"
 type OrganizationDto struct {
 	Id          uint64  `json:"id"`
 	UserId      uint64  `json:"userid"`
-	Name        uint64  `json:"name"`
+	Name        string  `json:"name"`
 	Description *string `json:"description,omitempty"`
 	City        string  `json:"city"`
 	Address     string  `json:"address"`

@@ -3,7 +3,7 @@ package requests
 import "github.com/BohdanBoriak/boilerplate-go-back/internal/domain"
 
 type OrganizationRequest struct {
-	Name        uint64  `json:"name" validate:"required"`
+	Name        string  `json:"name" validate:"required"`
 	Description *string `json:"description"`
 	City        string  `json:"city" validate:"required"`
 	Address     string  `json:"addrress" validate:"required"`

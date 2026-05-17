@@ -5,7 +5,7 @@ import "time"
 type Organization struct {
 	Id          uint64
 	UserId      uint64
-	Name        uint64
+	Name        string
 	Description *string
 	City        string
 	Address     string
