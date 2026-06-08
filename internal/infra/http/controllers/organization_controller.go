@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"errors"
 	"log"
 	"net/http"
 
@@ -56,5 +57,75 @@ func (c OrganizationController) FindList() http.HandlerFunc {
 		}
 
 		Success(w, resources.OrganizationDto{}.DomainToDtoCollection(orgs))
+	}
+}
+
+func (c OrganizationController) Find() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		user := r.Context().Value(UserKey).(domain.User)
+		org := r.Context().Value(OrgKey).(domain.Organization)
+
+		if user.Id != org.UserId {
+			Forbidden(w, errors.New("access denied"))
+			return
+		}
+
+		Success(w, resources.OrganizationDto{}.DomainToDto(org))
+	}
+}
+
+func (c OrganizationController) Update() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		user := r.Context().Value(UserKey).(domain.User)
+		org := r.Context().Value(OrgKey).(domain.Organization)
+
+		if user.Id != org.UserId {
+			Forbidden(w, errors.New("access denied"))
+			return
+		}
+
+		newOrg, err := requests.Bind(r, requests.OrganizationRequest{}, domain.Organization{})
+		if err != nil {
+			log.Printf("OrganizationController.Update(requests.Bind): %s", err)
+			BadRequest(w, err)
+			return
+		}
+
+		org.Name = newOrg.Name
+		org.Description = newOrg.Description
+		org.City = newOrg.City
+		org.Address = newOrg.Address
+		org.Lat = newOrg.Lat
+		org.Lon = newOrg.Lon
+
+		org, err = c.orgService.Update(org)
+		if err != nil {
+			log.Printf("OrganizationController.Update(c.orgService.Update): %s", err)
+			InternalServerError(w, err)
+			return
+		}
+
+		noContent(w)
+	}
+}
+
+func (c OrganizationController) Delete() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		user := r.Context().Value(UserKey).(domain.User)
+		org := r.Context().Value(OrgKey).(domain.Organization)
+
+		if user.Id != org.UserId {
+			Forbidden(w, errors.New("access denied"))
+			return
+		}
+
+		err := c.orgService.Delete(org.Id)
+		if err != nil {
+			log.Printf("OrganizationController.Update(c.orgService.Update): %s", err)
+			InternalServerError(w, err)
+			return
+		}
+
+		Success(w, resources.OrganizationDto{}.DomainToDto(org))
 	}
 }

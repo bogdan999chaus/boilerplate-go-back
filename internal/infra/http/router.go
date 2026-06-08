@@ -10,7 +10,9 @@ import (
 
 	"github.com/BohdanBoriak/boilerplate-go-back/config"
 	"github.com/BohdanBoriak/boilerplate-go-back/config/container"
+	"github.com/BohdanBoriak/boilerplate-go-back/internal/app"
 	"github.com/BohdanBoriak/boilerplate-go-back/internal/infra/http/controllers"
+	"github.com/BohdanBoriak/boilerplate-go-back/internal/infra/http/middlewares"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/cors"
 
@@ -50,7 +52,8 @@ func Router(cont container.Container) http.Handler {
 				apiRouter.Use(cont.AuthMw)
 
 				UserRouter(apiRouter, cont.UserController)
-				OrganizationRouter(apiRouter, cont.OrganizationController)
+				OrganizationRouter(apiRouter, cont.OrganizationController, cont.OrganizationService)
+				RoomRouter(apiRouter, cont.RoomController)
 				apiRouter.Handle("/*", NotFoundJSON())
 			})
 		})
@@ -102,10 +105,23 @@ func UserRouter(r chi.Router, uc controllers.UserController) {
 	})
 }
 
-func OrganizationRouter(r chi.Router, oc controllers.OrganizationController) {
+func OrganizationRouter(r chi.Router, oc controllers.OrganizationController, os app.OrganizationService) {
+	opom := middlewares.PathObject("orgId", controllers.OrgKey, os)
 	r.Route("/organizations", func(apiRouter chi.Router) {
 		apiRouter.Post("/", oc.Save())
 		apiRouter.Get("/", oc.FindList())
+		apiRouter.With(opom).Get("/{orgId}", oc.Find())
+		apiRouter.With(opom).Put("/{orgId}", oc.Update())
+		apiRouter.With(opom).Delete("/{orgId}", oc.Delete())
+	})
+}
+
+func RoomRouter(r chi.Router, rc controllers.RoomController) {
+	r.Route("/rooms", func(apiRouter chi.Router) {
+		apiRouter.Get("/{id}", rc.FindById)
+		apiRouter.Post("/", rc.Create)
+		apiRouter.Put("/{id}", rc.Update)
+		apiRouter.Delete("/{id}", rc.Delete)
 	})
 }
 

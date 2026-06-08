@@ -31,6 +31,9 @@ type organizationRepository struct {
 type OrganizationRepository interface {
 	Save(o domain.Organization) (domain.Organization, error)
 	FindList(uId uint64) ([]domain.Organization, error)
+	Find(id uint64) (domain.Organization, error)
+	Update(o domain.Organization) (domain.Organization, error)
+	Delete(id uint64) error
 }
 
 func NewOrganizationRepository(session db.Session) organizationRepository {
@@ -70,6 +73,37 @@ func (r organizationRepository) FindList(uId uint64) ([]domain.Organization, err
 
 	organizations := r.mapModelToDomainCollection(orgs)
 	return organizations, nil
+}
+
+func (r organizationRepository) Find(id uint64) (domain.Organization, error) {
+	var org organization
+
+	err := r.coll.Find(db.Cond{"id": id, "deleted_date": nil}).One(&org)
+	if err != nil {
+		return domain.Organization{}, err
+	}
+
+	o := r.mapModelToDomain(org)
+	return o, nil
+}
+
+func (r organizationRepository) Update(o domain.Organization) (domain.Organization, error) {
+	org := r.mapDomainToModel(o)
+	org.UpdatedDate = time.Now()
+
+	err := r.coll.
+		Find(db.Cond{"id": o.Id, "deleted_date": nil}).
+		Update(&org)
+	if err != nil {
+		return domain.Organization{}, err
+	}
+
+	o = r.mapModelToDomain(org)
+	return o, nil
+}
+
+func (r organizationRepository) Delete(id uint64) error {
+	return r.coll.Find(db.Cond{"id": id, "deleted_date": nil}).Update(map[string]interface{}{"deleted_date": time.Now()})
 }
 
 func (r organizationRepository) mapDomainToModel(o domain.Organization) organization {
